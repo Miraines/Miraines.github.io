@@ -55,20 +55,14 @@
     <div class="container">
         <h1>Конвертер Координат</h1>
 
-        <label for="from">Из системы координат:</label><br>
-        <select id="from" onchange="toggleZInput()">
-            <option value="cartesian">Декартовы</option>
-            <option value="polar">Полярные</option>
-            <option value="spherical">Сферические</option>
-            <option value="cylindrical">Цилиндрические</option>
-        </select><br>
-
-        <label for="to">В систему координат:</label><br>
-        <select id="to" onchange="toggleZInput()">
-            <option value="cartesian">Декартовы</option>
-            <option value="polar">Полярные</option>
-            <option value="spherical">Сферические</option>
-            <option value="cylindrical">Цилиндрические</option>
+        <label for="conversion">Выберите преобразование:</label><br>
+        <select id="conversion" onchange="toggleZInput()">
+            <option value="cartesianToPolar">Декартовы (2D) -> Полярные</option>
+            <option value="polarToCartesian">Полярные -> Декартовы (2D)</option>
+            <option value="cartesianToSpherical">Декартовы (3D) -> Сферические</option>
+            <option value="sphericalToCartesian">Сферические -> Декартовы (3D)</option>
+            <option value="cartesianToCylindrical">Декартовы (3D) -> Цилиндрические</option>
+            <option value="cylindricalToCartesian">Цилиндрические -> Декартовы (3D)</option>
         </select><br>
 
         <label for="x">Координата X:</label><br>
@@ -92,12 +86,11 @@
 
     <script>
         function toggleZInput() {
-            const fromSystem = document.getElementById('from').value;
-            const toSystem = document.getElementById('to').value;
+            const conversionType = document.getElementById('conversion').value;
             const zInputDiv = document.getElementById('zInput');
-            
-            // Показываем поле Z только для сферических или цилиндрических систем координат
-            if (fromSystem === 'spherical' || fromSystem === 'cylindrical' || toSystem === 'spherical' || toSystem === 'cylindrical') {
+
+            // Показываем поле Z только для 3D преобразований
+            if (conversionType.includes('Spherical') || conversionType.includes('Cylindrical') || conversionType.includes('3D')) {
                 zInputDiv.classList.remove('hidden');
             } else {
                 zInputDiv.classList.add('hidden');
@@ -105,14 +98,13 @@
         }
 
         function convert() {
-            let fromSystem = document.getElementById('from').value;
-            let toSystem = document.getElementById('to').value;
+            let conversionType = document.getElementById('conversion').value;
             let x = parseFloat(document.getElementById('x').value);
             let y = parseFloat(document.getElementById('y').value);
             let z = parseFloat(document.getElementById('z').value);
             let precision = parseInt(document.getElementById('precision').value);
 
-            if (isNaN(x) || isNaN(y) || isNaN(precision) || (fromSystem !== 'polar' && fromSystem !== 'cartesian' && isNaN(z))) {
+            if (isNaN(x) || isNaN(y) || isNaN(precision) || (conversionType.includes('3D') && isNaN(z))) {
                 alert('Пожалуйста, введите все значения корректно!');
                 return;
             }
@@ -120,27 +112,74 @@
             let result = '';
 
             // Преобразования
-            if (fromSystem === 'cartesian' && toSystem === 'polar') {
-                // Декартовы -> Полярные
-                let r = Math.sqrt(x * x + y * y);
-                let theta = Math.atan2(y, x) * (180 / Math.PI); // Переводим радианы в градусы
-                r = r.toFixed(precision);
-                theta = theta.toFixed(precision);
-                result = `Полярные Координаты: r = ${r}, θ = ${theta}°`;
-            } 
-            else if (fromSystem === 'polar' && toSystem === 'cartesian') {
-                // Полярные -> Декартовы
-                let r = parseFloat(x);
-                let theta = parseFloat(y) * (Math.PI / 180); // Переводим градусы в радианы
-                let cartesianX = r * Math.cos(theta);
-                let cartesianY = r * Math.sin(theta);
-                cartesianX = cartesianX.toFixed(precision);
-                cartesianY = cartesianY.toFixed(precision);
-                result = `Декартовы Координаты: X = ${cartesianX}, Y = ${cartesianY}`;
-            }
-            // Другие преобразования можно добавить ниже по аналогии
-            else {
-                result = 'Преобразование между выбранными системами не поддерживается.';
+            switch (conversionType) {
+                case 'cartesianToPolar':
+                    // Декартовы -> Полярные (2D)
+                    let r = Math.sqrt(x * x + y * y);
+                    let theta = Math.atan2(y, x) * (180 / Math.PI); // Переводим радианы в градусы
+                    r = r.toFixed(precision);
+                    theta = theta.toFixed(precision);
+                    result = `Полярные Координаты: r = ${r}, θ = ${theta}°`;
+                    break;
+
+                case 'polarToCartesian':
+                    // Полярные -> Декартовы (2D)
+                    let rPolar = parseFloat(x);
+                    let thetaPolar = parseFloat(y) * (Math.PI / 180); // Переводим градусы в радианы
+                    let cartesianX = rPolar * Math.cos(thetaPolar);
+                    let cartesianY = rPolar * Math.sin(thetaPolar);
+                    cartesianX = cartesianX.toFixed(precision);
+                    cartesianY = cartesianY.toFixed(precision);
+                    result = `Декартовы Координаты: X = ${cartesianX}, Y = ${cartesianY}`;
+                    break;
+
+                case 'cartesianToSpherical':
+                    // Декартовы -> Сферические (3D)
+                    let rSpherical = Math.sqrt(x * x + y * y + z * z);
+                    let thetaSpherical = Math.atan2(y, x) * (180 / Math.PI); // радианы в градусы
+                    let phiSpherical = Math.acos(z / rSpherical) * (180 / Math.PI); // радианы в градусы
+                    rSpherical = rSpherical.toFixed(precision);
+                    thetaSpherical = thetaSpherical.toFixed(precision);
+                    phiSpherical = phiSpherical.toFixed(precision);
+                    result = `Сферические Координаты: r = ${rSpherical}, θ = ${thetaSpherical}°, φ = ${phiSpherical}°`;
+                    break;
+
+                case 'sphericalToCartesian':
+                    // Сферические -> Декартовы (3D)
+                    let rSph = parseFloat(x);
+                    let thetaSph = parseFloat(y) * (Math.PI / 180); // градусы в радианы
+                    let phiSph = parseFloat(z) * (Math.PI / 180); // градусы в радианы
+                    let cartesianXSph = rSph * Math.sin(phiSph) * Math.cos(thetaSph);
+                    let cartesianYSph = rSph * Math.sin(phiSph) * Math.sin(thetaSph);
+                    let cartesianZSph = rSph * Math.cos(phiSph);
+                    cartesianXSph = cartesianXSph.toFixed(precision);
+                    cartesianYSph = cartesianYSph.toFixed(precision);
+                    cartesianZSph = cartesianZSph.toFixed(precision);
+                    result = `Декартовы Координаты: X = ${cartesianXSph}, Y = ${cartesianYSph}, Z = ${cartesianZSph}`;
+                    break;
+
+                case 'cartesianToCylindrical':
+                    // Декартовы -> Цилиндрические (3D)
+                    let rCylindrical = Math.sqrt(x * x + y * y);
+                    let thetaCylindrical = Math.atan2(y, x) * (180 / Math.PI); // радианы в градусы
+                    rCylindrical = rCylindrical.toFixed(precision);
+                    thetaCylindrical = thetaCylindrical.toFixed(precision);
+                    result = `Цилиндрические Координаты: r = ${rCylindrical}, θ = ${thetaCylindrical}°, Z = ${z}`;
+                    break;
+
+                case 'cylindricalToCartesian':
+                    // Цилиндрические -> Декартовы (3D)
+                    let rCyl = parseFloat(x);
+                    let thetaCyl = parseFloat(y) * (Math.PI / 180); // градусы в радианы
+                    let cartesianXCyl = rCyl * Math.cos(thetaCyl);
+                    let cartesianYCyl = rCyl * Math.sin(thetaCyl);
+                    cartesianXCyl = cartesianXCyl.toFixed(precision);
+                    cartesianYCyl = cartesianYCyl.toFixed(precision);
+                    result = `Декартовы Координаты: X = ${cartesianXCyl}, Y = ${cartesianYCyl}, Z = ${z}`;
+                    break;
+
+                default:
+                    result = 'Преобразование между выбранными системами не поддерживается.';
             }
 
             document.getElementById('result').innerHTML = result;
