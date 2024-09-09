@@ -65,15 +65,15 @@
             <option value="cylindricalToCartesian">Цилиндрические -> Декартовы (3D)</option>
         </select><br>
 
-        <label for="x">Координата X:</label><br>
-        <input type="number" id="x" placeholder="Введите X"><br>
+        <label for="x">Координата X (или r):</label><br>
+        <input type="number" id="x" placeholder="Введите X или r"><br>
         
-        <label for="y">Координата Y:</label><br>
-        <input type="number" id="y" placeholder="Введите Y"><br>
+        <label for="y">Координата Y (или θ):</label><br>
+        <input type="number" id="y" placeholder="Введите Y или θ"><br>
 
         <div id="zInput" class="hidden">
-            <label for="z">Координата Z:</label><br>
-            <input type="number" id="z" placeholder="Введите Z (для 3D систем)"><br>
+            <label for="z">Координата Z (или φ):</label><br>
+            <input type="number" id="z" placeholder="Введите Z или φ"><br>
         </div>
 
         <label for="precision">Точность (знаков после запятой):</label><br>
@@ -89,7 +89,7 @@
             const conversionType = document.getElementById('conversion').value;
             const zInputDiv = document.getElementById('zInput');
 
-            // Показываем поле Z только для 3D преобразований
+            // Показываем поле Z только для 3D преобразований (сферические и цилиндрические)
             if (conversionType.includes('Spherical') || conversionType.includes('Cylindrical') || conversionType.includes('3D')) {
                 zInputDiv.classList.remove('hidden');
             } else {
