@@ -46,6 +46,9 @@
             font-size: 18px;
             font-weight: bold;
         }
+        .hidden {
+            display: none;
+        }
     </style>
 </head>
 <body>
@@ -53,7 +56,7 @@
         <h1>Конвертер Координат</h1>
 
         <label for="from">Из системы координат:</label><br>
-        <select id="from">
+        <select id="from" onchange="toggleZInput()">
             <option value="cartesian">Декартовы</option>
             <option value="polar">Полярные</option>
             <option value="spherical">Сферические</option>
@@ -61,7 +64,7 @@
         </select><br>
 
         <label for="to">В систему координат:</label><br>
-        <select id="to">
+        <select id="to" onchange="toggleZInput()">
             <option value="cartesian">Декартовы</option>
             <option value="polar">Полярные</option>
             <option value="spherical">Сферические</option>
@@ -74,8 +77,10 @@
         <label for="y">Координата Y:</label><br>
         <input type="number" id="y" placeholder="Введите Y"><br>
 
-        <label for="z">Координата Z (если нужно):</label><br>
-        <input type="number" id="z" placeholder="Введите Z (для 3D систем)"><br>
+        <div id="zInput" class="hidden">
+            <label for="z">Координата Z:</label><br>
+            <input type="number" id="z" placeholder="Введите Z (для 3D систем)"><br>
+        </div>
 
         <label for="precision">Точность (знаков после запятой):</label><br>
         <input type="number" id="precision" placeholder="Точность"><br>
@@ -86,6 +91,19 @@
     </div>
 
     <script>
+        function toggleZInput() {
+            const fromSystem = document.getElementById('from').value;
+            const toSystem = document.getElementById('to').value;
+            const zInputDiv = document.getElementById('zInput');
+            
+            // Показываем поле Z только для сферических или цилиндрических систем координат
+            if (fromSystem === 'spherical' || fromSystem === 'cylindrical' || toSystem === 'spherical' || toSystem === 'cylindrical') {
+                zInputDiv.classList.remove('hidden');
+            } else {
+                zInputDiv.classList.add('hidden');
+            }
+        }
+
         function convert() {
             let fromSystem = document.getElementById('from').value;
             let toSystem = document.getElementById('to').value;
