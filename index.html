@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Конвертер Координат</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f8ff;
+            color: #333;
+            text-align: center;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+        }
+        h1 {
+            color: #007acc;
+        }
+        input, select {
+            padding: 10px;
+            margin: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            width: 80%;
+        }
+        button {
+            background-color: #007acc;
+            color: #fff;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #005fa3;
+        }
+        .result {
+            margin-top: 20px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Конвертер Координат</h1>
+
+        <label for="from">Из системы координат:</label><br>
+        <select id="from">
+            <option value="cartesian">Декартовы</option>
+            <option value="polar">Полярные</option>
+            <option value="spherical">Сферические</option>
+            <option value="cylindrical">Цилиндрические</option>
+        </select><br>
+
+        <label for="to">В систему координат:</label><br>
+        <select id="to">
+            <option value="cartesian">Декартовы</option>
+            <option value="polar">Полярные</option>
+            <option value="spherical">Сферические</option>
+            <option value="cylindrical">Цилиндрические</option>
+        </select><br>
+
+        <label for="x">Координата X:</label><br>
+        <input type="number" id="x" placeholder="Введите X"><br>
+        
+        <label for="y">Координата Y:</label><br>
+        <input type="number" id="y" placeholder="Введите Y"><br>
+
+        <label for="z">Координата Z (если нужно):</label><br>
+        <input type="number" id="z" placeholder="Введите Z (для 3D систем)"><br>
+
+        <label for="precision">Точность (знаков после запятой):</label><br>
+        <input type="number" id="precision" placeholder="Точность"><br>
+
+        <button onclick="convert()">Конвертировать</button>
+        
+        <div class="result" id="result"></div>
+    </div>
+
+    <script>
+        function convert() {
+            let fromSystem = document.getElementById('from').value;
+            let toSystem = document.getElementById('to').value;
+            let x = parseFloat(document.getElementById('x').value);
+            let y = parseFloat(document.getElementById('y').value);
+            let z = parseFloat(document.getElementById('z').value);
+            let precision = parseInt(document.getElementById('precision').value);
+
+            if (isNaN(x) || isNaN(y) || isNaN(precision) || (fromSystem !== 'polar' && fromSystem !== 'cartesian' && isNaN(z))) {
+                alert('Пожалуйста, введите все значения корректно!');
+                return;
+            }
+
+            let result = '';
+
+            // Преобразования
+            if (fromSystem === 'cartesian' && toSystem === 'polar') {
+                // Декартовы -> Полярные
+                let r = Math.sqrt(x * x + y * y);
+                let theta = Math.atan2(y, x) * (180 / Math.PI); // Переводим радианы в градусы
+                r = r.toFixed(precision);
+                theta = theta.toFixed(precision);
+                result = `Полярные Координаты: r = ${r}, θ = ${theta}°`;
+            } 
+            else if (fromSystem === 'polar' && toSystem === 'cartesian') {
+                // Полярные -> Декартовы
+                let r = parseFloat(x);
+                let theta = parseFloat(y) * (Math.PI / 180); // Переводим градусы в радианы
+                let cartesianX = r * Math.cos(theta);
+                let cartesianY = r * Math.sin(theta);
+                cartesianX = cartesianX.toFixed(precision);
+                cartesianY = cartesianY.toFixed(precision);
+                result = `Декартовы Координаты: X = ${cartesianX}, Y = ${cartesianY}`;
+            }
+            // Другие преобразования можно добавить ниже по аналогии
+            else {
+                result = 'Преобразование между выбранными системами не поддерживается.';
+            }
+
+            document.getElementById('result').innerHTML = result;
+        }
+    </script>
+</body>
+</html>
