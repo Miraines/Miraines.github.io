@@ -90,11 +90,14 @@
             const zInputDiv = document.getElementById('zInput');
 
             // Показываем поле Z только для 3D преобразований (сферические и цилиндрические)
-            if (conversionType.includes('Spherical') || conversionType.includes('Cylindrical') || conversionType.includes('3D')) {
-                zInputDiv.classList.remove('hidden');
-            } else {
-                zInputDiv.classList.add('hidden');
-            }
+            if (conversionType === 'cartesianToSpherical' || 
+            conversionType === 'sphericalToCartesian' ||
+            conversionType === 'cartesianToCylindrical' ||
+            conversionType === 'cylindricalToCartesian') {
+            zInputDiv.classList.remove('hidden');
+        } else {
+            zInputDiv.classList.add('hidden');
+        }
         }
 
         function convert() {
